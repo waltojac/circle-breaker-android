@@ -13,4 +13,10 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+    <string name="settings_name">Settings</string>
+    <string name="logout">Log-out</string>
+    <string name="levelsText">Levels</string>
+    <string name="levelFieldText">Level: 1</string>
+    <string name="playText">Play</string>
+    <string name="scoreText">Scoreboard</string>
 </resources>

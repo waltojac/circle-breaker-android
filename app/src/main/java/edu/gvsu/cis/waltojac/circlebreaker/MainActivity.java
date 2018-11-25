@@ -5,8 +5,11 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
@@ -16,12 +19,18 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     public static final int RC_SIGN_IN = 1;
+    public static final int PLAY_RV = 1;
+    public static final int LEVELS_RV = 1;
+    public static final int SCORE_RV = 1;
+
+
 
     FirebaseUser user;
 
@@ -45,17 +54,56 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button logOutButton = (Button) findViewById(R.id.logOutButton);
-        logOutButton.setOnClickListener(new View.OnClickListener() {
+        Button playButton = (Button) findViewById(R.id.playButton);
+        playButton.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View view) {
-                FirebaseAuth.getInstance().signOut();
-                Intent i = new Intent(MainActivity.this, LoginActivity.class);
-                startActivityForResult(i, RC_SIGN_IN);
+                // Send to play
+                Intent i = new Intent(MainActivity.this, PlayActivity.class);
+                startActivityForResult(i, PLAY_RV);
             }
         });
 
+        Button levelsButton = (Button) findViewById(R.id.levelsButton);
+        levelsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Send to levels
+                Intent i = new Intent(MainActivity.this, LevelsActivity.class);
+                startActivityForResult(i, LEVELS_RV);
+            }
+        });
 
+        Button scoreButton = (Button) findViewById(R.id.scoreButton);
+        scoreButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Send to levels
+                Intent i = new Intent(MainActivity.this, ScoreBoardActivity.class);
+                startActivityForResult(i, SCORE_RV);
+            }
+        });
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.settings_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.logout_item:
+                FirebaseAuth.getInstance().signOut();
+                Intent i = new Intent(MainActivity.this, LoginActivity.class);
+                startActivityForResult(i, RC_SIGN_IN);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
 

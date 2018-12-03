@@ -29,8 +29,8 @@ public class MainActivity extends AppCompatActivity {
     public static final int PLAY_RV = 1;
     public static final int LEVELS_RV = 1;
     public static final int SCORE_RV = 1;
-
-
+    private boolean online = true;
+    private Menu menu;
 
     FirebaseUser user;
 
@@ -38,14 +38,26 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user != null) {
-            Toast.makeText(this, "On Main",
-                    Toast.LENGTH_LONG).show();
-        } else {
-            Intent i = new Intent(MainActivity.this, LoginActivity.class);
-            startActivityForResult(i, RC_SIGN_IN);
+        Intent in = getIntent();
+
+        if (in.hasExtra("online")) {
+            this.online = in.getBooleanExtra("online", false);
+            Log.d("JAKEEEEEE", "Has Extra: " + this.online);
+
         }
+
+        if (online) {
+
+            user = FirebaseAuth.getInstance().getCurrentUser();
+            if (user != null) {
+                Toast.makeText(this, "On Main",
+                        Toast.LENGTH_LONG).show();
+            } else {
+                Intent i = new Intent(MainActivity.this, LoginActivity.class);
+                startActivityForResult(i, RC_SIGN_IN);
+            }
+        }
+
 
     }
 
@@ -53,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
         Button playButton = (Button) findViewById(R.id.playButton);
         playButton.setOnClickListener(new View.OnClickListener() {
@@ -94,6 +107,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        this.menu = menu;
+        if (!this.online) {
+            Log.d("JAKEEEEEE", "Changing title.");
+
+            menu.findItem(R.id.logout_item).setTitle("Log-in");
+        }
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.logout_item:
@@ -105,11 +130,6 @@ public class MainActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
-
-
-
-
-
 
 
 }

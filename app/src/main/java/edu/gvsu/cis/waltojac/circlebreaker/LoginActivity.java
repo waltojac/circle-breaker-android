@@ -1,6 +1,8 @@
 package edu.gvsu.cis.waltojac.circlebreaker;
 
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,6 +26,14 @@ public class LoginActivity extends AppCompatActivity {
     public static final int RC_SIGN_IN = 1;
     private boolean signedIn = false;
 
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(this.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,15 +45,23 @@ public class LoginActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        // User is signed out
-        Log.d("Auth:", "onAuthStateChanged:signed_out");
-        // Create and launch sign-in intent
-        startActivityForResult(
-                AuthUI.getInstance()
-                        .createSignInIntentBuilder()
-                        .setAvailableProviders(providers)
-                        .build(),
-                RC_SIGN_IN);
+
+        if (isNetworkAvailable()) {
+            Log.d("JAKEEEEEE", "HAS network");
+            // Create and launch sign-in intent
+            startActivityForResult(
+                    AuthUI.getInstance()
+                            .createSignInIntentBuilder()
+                            .setLogo(R.drawable.logo)
+                            .setAvailableProviders(providers)
+                            .build(),
+                    RC_SIGN_IN);
+        } else {
+            Log.d("JAKEEEEEE", "No network");
+            Intent i = new Intent(this, MainActivity.class);
+            i.putExtra("online", false);
+            startActivity(i);
+        }
     }
 
     @Override
@@ -59,6 +77,7 @@ public class LoginActivity extends AppCompatActivity {
                 Toast.makeText(this, "Sign-in worked",
                         Toast.LENGTH_LONG).show();
                 Intent intent = new Intent();
+                intent.putExtra("online", true);
                 setResult(MainActivity.RC_SIGN_IN ,intent);
                 finish();
                 // ...
@@ -67,7 +86,7 @@ public class LoginActivity extends AppCompatActivity {
                 // sign-in flow using the back button. Otherwise check
                 // response.getError().getErrorCode() and handle the error.
                 // ...
-                Toast.makeText(this, "Sign-in failed",
+                Toast.makeText(this, "Sign-in failed. Try again.",
                         Toast.LENGTH_LONG).show();
             }
         }

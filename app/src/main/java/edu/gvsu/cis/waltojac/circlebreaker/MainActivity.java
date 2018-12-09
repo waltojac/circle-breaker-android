@@ -111,9 +111,7 @@ public class MainActivity extends AppCompatActivity {
         super.onPrepareOptionsMenu(menu);
         this.menu = menu;
         if (!this.online) {
-            Log.d("JAKEEEEEE", "Changing title.");
-
-            menu.findItem(R.id.logout_item).setTitle("Log-in");
+            menu.findItem(R.id.logout_item).setEnabled(false);
         }
         return true;
     }

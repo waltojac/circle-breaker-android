@@ -1,7 +1,9 @@
 package edu.gvsu.cis.waltojac.circlebreaker;
 
+import android.app.DownloadManager;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,12 +18,22 @@ import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.components.Component;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import edu.gvsu.cis.waltojac.circlebreaker.dummy.ScoreContent;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -47,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (online) {
-
+            loadScore();
             user = FirebaseAuth.getInstance().getCurrentUser();
             if (user != null) {
                 Toast.makeText(this, "On Main",
@@ -61,10 +73,56 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    protected void loadScore() {
+        Log.d("JAKEEEEEEE", "Loading firebase data...");
+        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
+
+        ScoreContent.clear();
+        final int[] i = {1};
+        dbRef.child("highScores").orderByChild("level").addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot data, @Nullable String str) {
+                ScoreReport s = data.getValue(ScoreReport.class);
+                ScoreContent.addItem(new ScoreContent.ScoreItem(Integer.toString(i[0]), s.username, s.level));
+                i[0]++;
+                Log.d("JAKEEEEEEE", "Added an Item: " + i[0] + s.username + s.level);
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.d("JAKEEEEEEE", "onCancelled: " + databaseError);
+            }
+        });
+
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
+
+        /*for (int i = 1; i<20; i++){
+            ScoreReport item = new ScoreReport( "waltojac", "10");
+            dbRef.child("highScores").push().setValue(item);
+        }*/
+
 
 
         Button playButton = (Button) findViewById(R.id.playButton);

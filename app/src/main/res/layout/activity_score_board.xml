@@ -6,4 +6,72 @@
     android:layout_height="match_parent"
     tools:context=".ScoreBoardActivity">
 
+
+    <TextView
+        android:id="@+id/scoreBoardTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/scroreBoardTitleString"
+        android:textAlignment="center"
+        android:textSize="30sp"
+        app:layout_constraintBottom_toTopOf="@id/place"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <TextView
+        android:id="@+id/place"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/placeText"
+        app:layout_constraintBottom_toTopOf="@id/fragment"
+        app:layout_constraintEnd_toStartOf="@id/name"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/scoreBoardTitle" />
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/nameText"
+        app:layout_constraintBottom_toBottomOf="@id/place"
+        app:layout_constraintEnd_toStartOf="@id/level"
+        app:layout_constraintStart_toEndOf="@id/place"
+        app:layout_constraintTop_toTopOf="@id/place" />
+
+    <TextView
+        android:id="@+id/level"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/levelText"
+        app:layout_constraintBottom_toBottomOf="@id/place"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/name"
+        app:layout_constraintTop_toTopOf="@id/place" />
+
+    <fragment
+        android:id="@+id/fragment"
+        android:name="edu.gvsu.cis.waltojac.circlebreaker.ScoreFragment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/userText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/name"
+        tools:layout_editor_absoluteX="173dp"
+        tools:layout_editor_absoluteY="109dp" />
+
+    <TextView
+        android:id="@+id/userText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/userText"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/fragment" />
+
+
 </android.support.constraint.ConstraintLayout>

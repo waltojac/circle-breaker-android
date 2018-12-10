@@ -19,4 +19,10 @@
     <string name="levelFieldText">Level: 1</string>
     <string name="playText">Play</string>
     <string name="scoreText">Scoreboard</string>
+    <string name="scroreBoardTitleString">Score Board</string>
+    <string name="userText">User Text</string>
+    <string name="placeText">Place</string>
+    <string name="nameText">Name</string>
+    <string name="levelText">Level</string>
+    <string name="chooseLevel">Choose a Level</string>
 </resources>

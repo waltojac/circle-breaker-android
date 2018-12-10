@@ -1,27 +1,32 @@
 package edu.gvsu.cis.waltojac.circlebreaker;
 
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.firebase.ui.auth.AuthUI;
-import com.firebase.ui.auth.IdpResponse;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Collections;
+import java.util.Comparator;
+
+import edu.gvsu.cis.waltojac.circlebreaker.dummy.LevelContent;
+import edu.gvsu.cis.waltojac.circlebreaker.dummy.ScoreContent;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,8 +36,11 @@ public class MainActivity extends AppCompatActivity {
     public static final int SCORE_RV = 1;
     private boolean online = true;
     private Menu menu;
-
     FirebaseUser user;
+    DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
+    private ArrayList<ScoreReport> list = new ArrayList<ScoreReport>();
+    protected int topLevel = 1;
+
 
     @Override
     protected void onResume() {
@@ -47,7 +55,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (online) {
-
+            loadScore();
+            loadLevels();
             user = FirebaseAuth.getInstance().getCurrentUser();
             if (user != null) {
                 Toast.makeText(this, "On Main",
@@ -61,10 +70,98 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void loadLevels() {
+        Log.d("JAKEEEEEEE", "Loading level data...");
+        topLevel = 1;
+        dbRef.child("scores").child("waltojac10").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Log.d("JAKEEEEEEE", "Recieved level...");
+                ScoreReport s = dataSnapshot.getValue(ScoreReport.class);
+                topLevel = Integer.parseInt(s.level);
+                fillLevels();
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    protected void fillLevels() {
+        LevelContent.clear();
+        for (int i = 1; i <= this.topLevel; i++) {
+            LevelContent.addItem(new LevelContent.LevelItem(Integer.toString(i)));
+        }
+    }
+
+    protected void loadScore() {
+        list.clear();
+        Log.d("JAKEEEEEEE", "Loading firebase data...");
+
+        dbRef.child("scores").orderByChild("level").addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot data, @Nullable String str) {
+                ScoreReport s = data.getValue(ScoreReport.class);
+                list.add(s);
+                //ScoreContent.addItem(new ScoreContent.ScoreItem(Integer.toString(i[0]), s.username, s.level));
+                Log.d("JAKEEEEEEE", "Added to list: " + s.username + s.level);
+                fillScore();
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.d("JAKEEEEEEE", "onCancelled: " + databaseError);
+            }
+        });
+
+
+
+    }
+
+    protected void fillScore () {
+        final int[] i = {1};
+        ScoreContent.clear();
+
+        Collections.sort(list, new sortByLevel());
+
+        for (ScoreReport s : list) {
+            Log.d("JAKEEEEEEE", "Added an Item: " + s + i[0] + s.username + s.level);
+            ScoreContent.addItem(new ScoreContent.ScoreItem(Integer.toString(i[0]), s.username, s.level));
+            i[0]++;
+
+        }
+    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
+
+        /*for (int i = 1; i<20; i++){
+            ScoreReport item = new ScoreReport( "waltojac" + Integer.toString(i), Integer.toString(i));
+            dbRef.child("scores").child("waltojac" + Integer.toString(i)).setValue(item);
+        }*/
+
 
 
         Button playButton = (Button) findViewById(R.id.playButton);
@@ -74,6 +171,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 // Send to play
                 Intent i = new Intent(MainActivity.this, PlayActivity.class);
+                i.putExtra("level", Integer.toString(topLevel));
                 startActivityForResult(i, PLAY_RV);
             }
         });
@@ -111,9 +209,7 @@ public class MainActivity extends AppCompatActivity {
         super.onPrepareOptionsMenu(menu);
         this.menu = menu;
         if (!this.online) {
-            Log.d("JAKEEEEEE", "Changing title.");
-
-            menu.findItem(R.id.logout_item).setTitle("Log-in");
+            menu.findItem(R.id.logout_item).setEnabled(false);
         }
         return true;
     }
@@ -132,4 +228,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+}
+
+class sortByLevel implements Comparator<ScoreReport>
+{
+    // Used for sorting in ascending order of
+    // roll number
+    public int compare(ScoreReport a, ScoreReport b)
+    {
+        return Integer.parseInt(b.level) - Integer.parseInt(a.level);
+    }
 }

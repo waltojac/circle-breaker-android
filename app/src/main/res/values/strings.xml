@@ -24,4 +24,5 @@
     <string name="placeText">Place</string>
     <string name="nameText">Name</string>
     <string name="levelText">Level</string>
+    <string name="chooseLevel">Choose a Level</string>
 </resources>

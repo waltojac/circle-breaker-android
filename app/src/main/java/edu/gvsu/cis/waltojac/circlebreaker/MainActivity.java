@@ -31,8 +31,11 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
+import edu.gvsu.cis.waltojac.circlebreaker.dummy.LevelContent;
 import edu.gvsu.cis.waltojac.circlebreaker.dummy.ScoreContent;
 
 public class MainActivity extends AppCompatActivity {
@@ -45,6 +48,9 @@ public class MainActivity extends AppCompatActivity {
     private Menu menu;
     FirebaseUser user;
     DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
+    private ArrayList<ScoreReport> list = new ArrayList<ScoreReport>();
+    protected int topLevel = 1;
+
 
     @Override
     protected void onResume() {
@@ -75,25 +81,41 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadLevels() {
-        Log.d("JAKEEEEEEE", "Loading firebase data...");
+        Log.d("JAKEEEEEEE", "Loading level data...");
+        dbRef.child("scores").child("waltojac10").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Log.d("JAKEEEEEEE", "Recieved level...");
+                ScoreReport s = dataSnapshot.getValue(ScoreReport.class);
+                topLevel = Integer.parseInt(s.level);
+                fillLevels();
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-        //dbRef.child("highScores")
-
+            }
+        });
 
     }
 
+    protected void fillLevels() {
+        for (int i = 1; i <= this.topLevel; i++) {
+            LevelContent.addItem(new LevelContent.LevelItem(Integer.toString(i)));
+        }
+    }
+
     protected void loadScore() {
+        list.clear();
         Log.d("JAKEEEEEEE", "Loading firebase data...");
 
-        ScoreContent.clear();
-        final int[] i = {1};
-        dbRef.child("highScores").orderByChild("level").addChildEventListener(new ChildEventListener() {
+        dbRef.child("scores").orderByChild("level").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot data, @Nullable String str) {
                 ScoreReport s = data.getValue(ScoreReport.class);
-                ScoreContent.addItem(new ScoreContent.ScoreItem(Integer.toString(i[0]), s.username, s.level));
-                i[0]++;
-                Log.d("JAKEEEEEEE", "Added an Item: " + i[0] + s.username + s.level);
+                list.add(s);
+                //ScoreContent.addItem(new ScoreContent.ScoreItem(Integer.toString(i[0]), s.username, s.level));
+                Log.d("JAKEEEEEEE", "Added to list: " + s.username + s.level);
+                fillScore();
             }
 
             @Override
@@ -117,7 +139,24 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+
     }
+
+    protected void fillScore () {
+        final int[] i = {1};
+        ScoreContent.clear();
+
+        Collections.sort(list, new sortByLevel());
+
+        for (ScoreReport s : list) {
+            Log.d("JAKEEEEEEE", "Added an Item: " + s + i[0] + s.username + s.level);
+            ScoreContent.addItem(new ScoreContent.ScoreItem(Integer.toString(i[0]), s.username, s.level));
+            i[0]++;
+
+        }
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,10 +165,10 @@ public class MainActivity extends AppCompatActivity {
 
         DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
 
-        for (int i = 1; i<20; i++){
-            ScoreReport item = new ScoreReport( "waltojac", "10");
-            dbRef.child("highScores").child("waltojac").setValue(item);
-        }
+        /*for (int i = 1; i<20; i++){
+            ScoreReport item = new ScoreReport( "waltojac" + Integer.toString(i), Integer.toString(i));
+            dbRef.child("scores").child("waltojac" + Integer.toString(i)).setValue(item);
+        }*/
 
 
 
@@ -196,4 +235,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+}
+
+class sortByLevel implements Comparator<ScoreReport>
+{
+    // Used for sorting in ascending order of
+    // roll number
+    public int compare(ScoreReport a, ScoreReport b)
+    {
+        return Integer.parseInt(b.level) - Integer.parseInt(a.level);
+    }
 }

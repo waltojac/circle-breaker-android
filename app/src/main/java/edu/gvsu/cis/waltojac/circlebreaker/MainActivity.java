@@ -43,8 +43,8 @@ public class MainActivity extends AppCompatActivity {
     public static final int SCORE_RV = 1;
     private boolean online = true;
     private Menu menu;
-
     FirebaseUser user;
+    DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
 
     @Override
     protected void onResume() {
@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (online) {
             loadScore();
+            loadLevels();
             user = FirebaseAuth.getInstance().getCurrentUser();
             if (user != null) {
                 Toast.makeText(this, "On Main",
@@ -73,9 +74,16 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void loadLevels() {
+        Log.d("JAKEEEEEEE", "Loading firebase data...");
+
+        //dbRef.child("highScores")
+
+
+    }
+
     protected void loadScore() {
         Log.d("JAKEEEEEEE", "Loading firebase data...");
-        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
 
         ScoreContent.clear();
         final int[] i = {1};
@@ -118,10 +126,10 @@ public class MainActivity extends AppCompatActivity {
 
         DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
 
-        /*for (int i = 1; i<20; i++){
+        for (int i = 1; i<20; i++){
             ScoreReport item = new ScoreReport( "waltojac", "10");
-            dbRef.child("highScores").push().setValue(item);
-        }*/
+            dbRef.child("highScores").child("waltojac").setValue(item);
+        }
 
 
 

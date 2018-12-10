@@ -63,6 +63,8 @@ public class Ball {
         return rad;
     }
 
+    public double getAngle() { return -Math.toDegrees(Math.atan(-dY/dX)) + 90; }
+
     public void draw(Canvas c) {
         if(paint != null) {
             c.drawCircle(mX, mY, rad, paint);

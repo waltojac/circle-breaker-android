@@ -21,9 +21,11 @@ public class GameView extends SurfaceView {
     private SurfaceHolder holder;
     private GameThread gameThread;
     private Game game;
+    private int seedLvl;
 
-    public GameView (Context context) {
+    public GameView (Context context, int level) {
         super(context);
+        seedLvl = level;
         gameThread = new GameThread(this);
         holder = getHolder();
 
@@ -31,7 +33,7 @@ public class GameView extends SurfaceView {
             @Override
             public void surfaceCreated(SurfaceHolder surfaceHolder){
                 Canvas c = holder.lockCanvas();
-                game = new Game(c, getContext());
+                game = new Game(c, getContext(), seedLvl);
                 game.registerSensors();
                 holder.unlockCanvasAndPost(c);
                 gameThread.setRunning(true, game);

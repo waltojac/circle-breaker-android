@@ -11,6 +11,8 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.util.Log;
 
+import java.util.Random;
+
 import static android.content.Context.SENSOR_SERVICE;
 
 public class Ring implements SensorEventListener {
@@ -35,18 +37,19 @@ public class Ring implements SensorEventListener {
     private final SensorManager mSensorManager;
     private final Sensor mAccelerometer;
 
-    public Ring(int x, int y,int rad, int numSectors, Context context) {
+    public Ring(int x, int y,int rad, int numSectors, Context context, int seedLvl) {
+        Random rand = new Random(seedLvl);
         mX = x;
         mY = y;
         this.rad = rad;
         this.numSectors = numSectors;
         winCheck = numSectors;
-        sectorSpan = 360 / numSectors;
+        sectorSpan = 360.0 / numSectors;
 
         sectors = new RingSector[numSectors];
         for(int i=0; i < numSectors; i++) {
-            sectors[i] = new RingSector((i*sectorSpan) + gap, ((i+1)*sectorSpan) - gap, 1); // leaves a small gap
-        }
+            sectors[i] = new RingSector((i*sectorSpan) + gap, ((i+1)*sectorSpan) - gap, rand.nextInt(3) + 1);
+    }
 
         mPaint = new Paint();
         mPaint.setStyle(Paint.Style.STROKE);
@@ -69,6 +72,10 @@ public class Ring implements SensorEventListener {
     public int getY() {
         return mY;
     }
+
+    public int getX() { return mX; }
+
+    public int getT() { return t; }
 
     public void update() {
         double change;
@@ -97,19 +104,23 @@ public class Ring implements SensorEventListener {
         }
     }
 
-    public void draw(Canvas c){
+    public boolean draw(Canvas c){
         double from;
         double to;
+        boolean won = true;
         RectF oval = new RectF(mX - rad, mY - rad, mX + rad, mY + rad);
 
         for(int i=0; i<numSectors; i++) {
             if (sectors[i].isValid()) {
+                won = false;
+                mPaint.setAlpha((int)(sectors[i].getHealth() * 240 + 15));
                 from = sectors[i].getFrom();
                 to = sectors[i].getTo();
                 c.drawArc(oval, (float)(from + rotation), (float)(to - from), false, mPaint);
                 //Log.d("sector", "getting drawn");
             }
         }
+        return won;
     }
 
     public void registerSensors() {

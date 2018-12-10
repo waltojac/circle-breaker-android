@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.Log;
+import java.util.Random;
 
 import Components.Ball;
 import Components.Ring;
@@ -16,22 +17,55 @@ public class Game {
     private Ring myRing;
     private boolean playing = true;
     private boolean won = false;
+    private boolean reported = false;
+    public int seedLvl;
+    private PlayActivity playActivity;
+    private Canvas c;
+    private Paint ballP;
 
-    public Game(Canvas c, Context context) {
+    public Game(Canvas c, Context context, int level) {
+        this.c = c;
+        playActivity = (PlayActivity) context;
+        Log.d("score", "Context: " + playActivity);
+        seedLvl = level;
+        Random rand = new Random(seedLvl);
         Paint mPaint = new Paint();
         int centerX = c.getWidth()/2;
         int centerY = c.getHeight()/2;
 
         mPaint.setStyle(Paint.Style.FILL);
         mPaint.setColor(0xFFE82C64);
-
-        myB = new Ball(centerX, centerY, 25);
-        myB.setSpeed(0, 10);
-        myB.setAcc(0, .5);
-        myB.setPaint(mPaint);
+        ballP = mPaint;
 
         int radius = (int)(c.getWidth() * .45);
-        myRing = new Ring(centerX, centerY, radius, 15, context);
+        int numSectors = rand.nextInt(seedLvl/2) + rand.nextInt(seedLvl/2) + 5;
+        myRing = new Ring(centerX, centerY, radius, numSectors, context, seedLvl);
+
+        myB = new Ball(centerX, centerY, 20);
+        myB.setSpeed(0, 10);
+        myB.setAcc(0, .5);
+        myB.setPaint(ballP);
+    }
+
+    public void remake(int level) {
+        reported = false;
+        playing = true;
+        won = false;
+
+        int centerX = c.getWidth()/2;
+        int centerY = c.getHeight()/2;
+
+        seedLvl = level;
+        Random rand = new Random(seedLvl);
+
+        int radius = (int)(c.getWidth() * .45);
+        int numSectors = rand.nextInt(seedLvl/2) + rand.nextInt(seedLvl/2) + 5;
+        myRing = new Ring(centerX, centerY, radius, numSectors, playActivity, seedLvl);
+
+        myB = new Ball(centerX, centerY, 20);
+        myB.setSpeed(0, 10);
+        myB.setAcc(0, .5);
+        myB.setPaint(ballP);
     }
 
     public void moveFrame(Canvas canvas) {
@@ -57,18 +91,24 @@ public class Game {
             myRing.update();
 
             myB.draw(canvas);
-            myRing.draw(canvas);
+            won = myRing.draw(canvas);
         }
     }
 
     public boolean checkCollision() {
         int ballRad = myB.getRad();
         int ballY = myB.getY();
+        int ballX = myB.getX();
 
         int ringRad = myRing.getRad();
         int ringY = myRing.getY();
+        int ringX = myRing.getX();
 
-        if(ballY + ballRad > ringY + ringRad) {
+        int distX = ballX - ringX;
+        int distY = ballY - ringY;
+        double dist = Math.sqrt(distX * distX + distY * distY) + ballRad;
+
+        if (dist > ringRad - ballRad) {
             return true;
         } else {
             return false;
@@ -78,8 +118,16 @@ public class Game {
     public void checkWin() {
         if(!playing && won) {
             //won
+            if(playActivity != null && !reported) {
+                reported = true;
+                playActivity.won(this);
+            }
         } else if (!playing && !won) {
-            //lost
+            // lost
+            if(playActivity != null && !reported) {
+                reported = true;
+                playActivity.lost(this);
+            }
         }
     }
 

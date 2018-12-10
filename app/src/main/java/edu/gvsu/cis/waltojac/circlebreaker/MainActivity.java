@@ -171,6 +171,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 // Send to play
                 Intent i = new Intent(MainActivity.this, PlayActivity.class);
+                i.putExtra("level", Integer.toString(topLevel));
                 startActivityForResult(i, PLAY_RV);
             }
         });

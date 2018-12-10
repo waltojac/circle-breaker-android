@@ -26,6 +26,10 @@ public class LevelContent {
         ITEMS.add(item);
     }
 
+    public static void clear() {
+        ITEMS.clear();
+    }
+
 //    private static String makeDetails(int position) {
 //        StringBuilder builder = new StringBuilder();
 //        builder.append("Details about Item: ").append(position);

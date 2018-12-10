@@ -1,27 +1,19 @@
 package edu.gvsu.cis.waltojac.circlebreaker;
 
-import android.app.DownloadManager;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.firebase.ui.auth.AuthUI;
-import com.firebase.ui.auth.IdpResponse;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.components.Component;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -30,10 +22,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 
 import edu.gvsu.cis.waltojac.circlebreaker.dummy.LevelContent;
 import edu.gvsu.cis.waltojac.circlebreaker.dummy.ScoreContent;
@@ -82,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadLevels() {
         Log.d("JAKEEEEEEE", "Loading level data...");
+        topLevel = 1;
         dbRef.child("scores").child("waltojac10").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -99,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     protected void fillLevels() {
+        LevelContent.clear();
         for (int i = 1; i <= this.topLevel; i++) {
             LevelContent.addItem(new LevelContent.LevelItem(Integer.toString(i)));
         }

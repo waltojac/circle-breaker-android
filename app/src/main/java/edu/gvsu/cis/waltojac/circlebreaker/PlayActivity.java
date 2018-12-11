@@ -3,12 +3,18 @@ package edu.gvsu.cis.waltojac.circlebreaker;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.view.LayoutInflater;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -27,6 +33,7 @@ public class PlayActivity extends AppCompatActivity {
     String idToken;
     DatabaseReference dbRef;
     ScoreReport item;
+    GameView gv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +41,9 @@ public class PlayActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         intent = this.getIntent();
 
-        setContentView(new GameView(this, Integer.parseInt(intent.getStringExtra("level"))));
+        gv = new GameView(this, Integer.parseInt(intent.getStringExtra("level")));
+
+        setContentView(gv);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         Toast.makeText(this, "Play hit, Level " + intent.getStringExtra("level"),
@@ -42,18 +51,12 @@ public class PlayActivity extends AppCompatActivity {
     }
 
     public void won(Game game) {
-        Log.d("connorrrrrr", "Won");
         game.remake(game.seedLvl + 1);
-        Log.d("connorrrrrr", "Won1");
 
         //user = FirebaseAuth.getInstance().getCurrentUser();
         item = new ScoreReport( user.getDisplayName(), Integer.toString(game.seedLvl + 1));
-        Log.d("connorrrrrr", "Won2");
 
         dbRef = FirebaseDatabase.getInstance().getReference();
-        Log.d("connorrrrrr", user.getIdToken(true).toString());
-
-        Log.d("connorrrrrr", "Won4");
     }
 
     public void updateData() {
@@ -63,5 +66,7 @@ public class PlayActivity extends AppCompatActivity {
     public void lost(Game game) {
         Log.d("score", "Lost");
         game.remake(game.seedLvl);
+        //createPopup();
+        //startActivity(new Intent(PlayActivity.this, popUpActivity.class));  //Only version of popup I can make thus far
     }
 }

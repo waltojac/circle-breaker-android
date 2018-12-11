@@ -48,7 +48,7 @@ public class Ring implements SensorEventListener {
 
         sectors = new RingSector[numSectors];
         for(int i=0; i < numSectors; i++) {
-            sectors[i] = new RingSector((i*sectorSpan) + gap, ((i+1)*sectorSpan) - gap, rand.nextInt(4));
+            sectors[i] = new RingSector((i*sectorSpan) + gap, ((i+1)*sectorSpan) - gap, rand.nextInt(4));  // last thing is max lives
     }
 
         mPaint = new Paint();
@@ -59,8 +59,6 @@ public class Ring implements SensorEventListener {
 
         mSensorManager = (SensorManager) context.getSystemService(SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        Log.d("sensor", "manager: " + mSensorManager);
-        Log.d("sensor", "Accel: " + mAccelerometer);
 
         //mSensorManager.registerListener(this, mAccelerometer,SensorManager.SENSOR_DELAY_NORMAL);
     }
@@ -91,13 +89,11 @@ public class Ring implements SensorEventListener {
      */
     public boolean checkHit(double angle) {
         angle = (angle + 90 + 360 - rotation) % 360; // Java likes 0 deg on right, the clockwise.
-        Log.d("hit", "angle: " + angle);
 
         int hit = (int) (angle / sectorSpan);
 
         if (sectors[hit].isValid()) {
             sectors[hit].hit(1);
-            Log.d("hit", "Hit num: " + hit);
             return true;
         } else {
             return false; // loss

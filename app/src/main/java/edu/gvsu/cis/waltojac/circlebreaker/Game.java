@@ -22,28 +22,34 @@ public class Game {
     private PlayActivity playActivity;
     private Canvas c;
     private Paint ballP;
+    private Paint wordsP;
 
     public Game(Canvas c, Context context, int level) {
         this.c = c;
         playActivity = (PlayActivity) context;
-        Log.d("score", "Context: " + playActivity);
         seedLvl = level;
         Random rand = new Random(seedLvl);
         Paint mPaint = new Paint();
         int centerX = c.getWidth()/2;
         int centerY = c.getHeight()/2;
 
+        wordsP = new Paint();
+        wordsP.setColor(Color.BLACK);
+        wordsP.setAntiAlias(true);
+        wordsP.setTextSize(70);
+        wordsP.setTextAlign(Paint.Align.CENTER);
+
         mPaint.setStyle(Paint.Style.FILL);
-        mPaint.setColor(0xFFE82C64);
+        mPaint.setColor(0xFFE82C64);  // ball COLOR
         ballP = mPaint;
 
         int radius = (int)(c.getWidth() * .45);
         int numSectors = (rand.nextInt(seedLvl) + rand.nextInt(seedLvl))/2 + 5;
-        myRing = new Ring(centerX, centerY, radius, numSectors, context, seedLvl);
+        myRing = new Ring(centerX, centerY, radius, numSectors, context, seedLvl); // Number of sections
 
         myB = new Ball(centerX, centerY + radius/2, 20);
         myB.setSpeed(0, -10);
-        myB.setAcc(0, .75);
+        myB.setAcc(0, .75);  // speed of ball
         myB.setPaint(ballP);
     }
 
@@ -60,13 +66,13 @@ public class Game {
         Random rand = new Random(seedLvl);
 
         int radius = (int)(c.getWidth() * .45);
-        int numSectors = rand.nextInt(seedLvl/2) + rand.nextInt(seedLvl/2) + 5;
+        int numSectors = (rand.nextInt(seedLvl) + rand.nextInt(seedLvl))/2 + 5; //Number of Sections
         myRing = new Ring(centerX, centerY, radius, numSectors, playActivity, seedLvl);
         registerSensors();
 
         myB = new Ball(centerX, centerY + radius/2, 20);
         myB.setSpeed(0, -10);
-        myB.setAcc(0, .75);
+        myB.setAcc(0, .75); // speed of ball
         myB.setPaint(ballP);
     }
 
@@ -75,7 +81,7 @@ public class Game {
 
         if (canvas != null) {
             checkWin();
-            canvas.drawColor(0xFFA8A8A8);
+            canvas.drawColor(0xFFA8A8A8); // background COLOR
             width = canvas.getWidth();
             height = canvas.getHeight();
             int bRad = myB.getRad();
@@ -95,7 +101,8 @@ public class Game {
             myRing.update();
 
             myB.draw(canvas);
-            won = myRing.draw(canvas);
+            won = myRing.draw(canvas); // assigning win if there are no rings left
+            canvas.drawText("Level : " + seedLvl, myRing.getX(), 100, wordsP);
         }
     }
 
@@ -117,6 +124,7 @@ public class Game {
         } else {
             return false;
         }
+
     }
 
     public void checkWin() {

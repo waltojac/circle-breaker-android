@@ -1,11 +1,8 @@
 package edu.gvsu.cis.waltojac.circlebreaker;
 
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;

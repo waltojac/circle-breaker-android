@@ -58,20 +58,13 @@
         android:name="edu.gvsu.cis.waltojac.circlebreaker.ScoreFragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/userText"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/name"
         tools:layout_editor_absoluteX="173dp"
         tools:layout_editor_absoluteY="109dp" />
 
-    <TextView
-        android:id="@+id/userText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/userText"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/fragment" />
 
 
 </android.support.constraint.ConstraintLayout>

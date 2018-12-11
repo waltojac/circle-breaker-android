@@ -19,13 +19,10 @@ public class ScoreBoardActivity extends AppCompatActivity implements ScoreFragme
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_score_board);
-
-        Toast.makeText(this, "Score hit",
-                Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void onListFragmentInteraction(ScoreContent.ScoreItem item) {
-        System.out.println("Interact");
+
     }
 }

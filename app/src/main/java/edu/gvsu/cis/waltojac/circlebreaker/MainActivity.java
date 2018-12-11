@@ -80,9 +80,11 @@ public class MainActivity extends AppCompatActivity {
 
         } else {
             this.online = false;
+            fillLevels();
         }
 
-
+        TextView title = findViewById(R.id.level);
+        title.setText("Level: " + topLevel);
     }
 
     private void loadLevels() {
@@ -216,6 +218,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.settings_menu, menu);
@@ -239,6 +243,7 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.logout_item:
                 if (online) {
+                    this.topLevel = 1;
                     FirebaseAuth.getInstance().signOut();
                     Intent i = new Intent(MainActivity.this, LoginActivity.class);
                     startActivityForResult(i, RC_SIGN_IN);
@@ -252,6 +257,15 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PLAY_RV) {
+            if (resultCode == RESULT_OK){
+                this.topLevel = data.getIntExtra("topLevel", 1);
+                Log.d("JAKEEEEEEEEE", "onActivityResult: " + this.topLevel);
+            }
+        }
+    }
 
 }
 

@@ -2,6 +2,8 @@ package edu.gvsu.cis.waltojac.circlebreaker;
 
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -38,6 +40,14 @@ public class PlayActivity extends AppCompatActivity {
     int highScore = 1;
     String scoreKey;
 
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(this.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,13 +69,19 @@ public class PlayActivity extends AppCompatActivity {
     }
 
     public void won(Game game) {
-        if (scoreKey != null) {
-            if ((game.seedLvl + 1) > highScore) {
-                updateScore(game.seedLvl + 1);
+        Log.d("WONNNNNNN", "won: ");
+
+        if (isNetworkAvailable()) {
+            if (scoreKey != null) {
+                if ((game.seedLvl + 1) > highScore) {
+                    updateScore(game.seedLvl + 1);
+                }
+            } else {
+                getScoreRef(game, game.seedLvl + 1);
             }
-        } else {
-            getScoreRef(game,game.seedLvl + 1);
         }
+
+        topLevel = game.seedLvl + 1;
 
         game.remake(game.seedLvl + 1);
 
@@ -81,10 +97,10 @@ public class PlayActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (!dataSnapshot.exists()) {
-                    item = new ScoreReport(user.getDisplayName(), user.getEmail(), Integer.toString(1));
+                    item = new ScoreReport(user.getDisplayName(), user.getEmail(), Integer.toString(2));
                     scoreKey = dbRef.child("scores").push().getKey();
                     dbRef.child("scores").child(scoreKey).setValue(item);
-                    highScore = 1;
+                    highScore = 2;
                 } else {
                     for (DataSnapshot score : dataSnapshot.getChildren()) {
                         scoreKey = score.getKey();
@@ -106,7 +122,19 @@ public class PlayActivity extends AppCompatActivity {
     public void lost(Game game) {
         Log.d("score", "Lost");
         game.remake(game.seedLvl);
+
+        topLevel = game.seedLvl;
+
         //createPopup();
         //startActivity(new Intent(PlayActivity.this, popUpActivity.class));  //Only version of popup I can make thus far
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent();
+        intent.putExtra("topLevel", topLevel);
+        setResult(RESULT_OK, intent);
+        finish();
     }
 }

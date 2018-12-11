@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.share.model.ShareLinkContent;
@@ -63,6 +64,12 @@ public class MainActivity extends AppCompatActivity {
             this.online = true;
 
             user = FirebaseAuth.getInstance().getCurrentUser();
+
+            /*for (int i = 1; i<20; i++){
+                ScoreReport item = new ScoreReport( this.user.getDisplayName(), this.user.getEmail(), Integer.toString(i));
+                dbRef.child("scores").push().setValue(item);
+            }*/
+
             if (user != null) {
                 loadScore();
                 loadLevels();
@@ -79,15 +86,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadLevels() {
-        Log.d("JAKEEEEEEE", "Loading level data...");
         topLevel = 1;
-        dbRef.child("scores").child("waltojac10").addValueEventListener(new ValueEventListener() {
+        dbRef.child("scores").orderByChild("email").equalTo(this.user.getEmail()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Log.d("JAKEEEEEEE", "Recieved level...");
-                ScoreReport s = dataSnapshot.getValue(ScoreReport.class);
-                topLevel = Integer.parseInt(s.level);
-                fillLevels();
+                for (DataSnapshot score : dataSnapshot.getChildren()) {
+                    ScoreReport s = score.getValue(ScoreReport.class);
+                    topLevel = Integer.parseInt(s.level);
+                    TextView title = findViewById(R.id.level);
+                    title.setText("Level: " + topLevel);
+                    fillLevels();
+                }
             }
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
@@ -114,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
                 ScoreReport s = data.getValue(ScoreReport.class);
                 list.add(s);
                 //ScoreContent.addItem(new ScoreContent.ScoreItem(Integer.toString(i[0]), s.username, s.level));
-                Log.d("JAKEEEEEEE", "Added to list: " + s.username + s.level);
+                Log.d("JAKEEEEEEE", "Added to list: " + s.displayName + s.level);
                 fillScore();
             }
 
@@ -150,8 +159,7 @@ public class MainActivity extends AppCompatActivity {
         Collections.sort(list, new sortByLevel());
 
         for (ScoreReport s : list) {
-            Log.d("JAKEEEEEEE", "Added an Item: " + s + i[0] + s.username + s.level);
-            ScoreContent.addItem(new ScoreContent.ScoreItem(Integer.toString(i[0]), s.username, s.level));
+            ScoreContent.addItem(new ScoreContent.ScoreItem(Integer.toString(i[0]), s.displayName, s.level));
             i[0]++;
 
         }
@@ -164,12 +172,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference();
-
-        /*for (int i = 1; i<20; i++){
-            ScoreReport item = new ScoreReport( "waltojac" + Integer.toString(i), Integer.toString(i));
-            dbRef.child("scores").child("waltojac" + Integer.toString(i)).setValue(item);
-        }*/
-
 
         ShareLinkContent content = new ShareLinkContent.Builder()
                 .setContentUrl(Uri.parse("https://www.facebook.com/Circle-Breaker-App-459444724585718/"))
@@ -187,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 // Send to play
                 Intent i = new Intent(MainActivity.this, PlayActivity.class);
-                i.putExtra("level", Integer.toString(topLevel));
+                i.putExtra("topLevel", Integer.toString(topLevel));
                 startActivityForResult(i, PLAY_RV);
             }
         });
@@ -226,6 +228,8 @@ public class MainActivity extends AppCompatActivity {
         this.menu = menu;
         if (!this.online) {
             menu.findItem(R.id.logout_item).setEnabled(false);
+        } else {
+            menu.findItem(R.id.logout_item).setEnabled(true);
         }
         return true;
     }
@@ -234,10 +238,15 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.logout_item:
-                FirebaseAuth.getInstance().signOut();
-                Intent i = new Intent(MainActivity.this, LoginActivity.class);
-                startActivityForResult(i, RC_SIGN_IN);
-                return true;
+                if (online) {
+                    FirebaseAuth.getInstance().signOut();
+                    Intent i = new Intent(MainActivity.this, LoginActivity.class);
+                    startActivityForResult(i, RC_SIGN_IN);
+                    return true;
+                }
+                else {
+                    return true;
+                }
             default:
                 return super.onOptionsItemSelected(item);
         }

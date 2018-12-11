@@ -68,6 +68,16 @@
                 android:layout_below="@+id/levelsButton"
                 android:text="@string/scoreText"
                 />
+
+            <com.facebook.share.widget.ShareButton
+                android:id="@+id/shareButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@id/scoreButton"
+                />
+
         </RelativeLayout>
+
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

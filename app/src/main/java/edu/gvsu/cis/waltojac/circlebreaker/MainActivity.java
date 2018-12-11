@@ -1,6 +1,7 @@
 package edu.gvsu.cis.waltojac.circlebreaker;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -12,6 +13,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.facebook.share.model.ShareLinkContent;
+import com.facebook.share.widget.ShareButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
@@ -162,6 +165,14 @@ public class MainActivity extends AppCompatActivity {
             dbRef.child("scores").child("waltojac" + Integer.toString(i)).setValue(item);
         }*/
 
+
+        ShareLinkContent content = new ShareLinkContent.Builder()
+                .setContentUrl(Uri.parse("https://www.facebook.com/Circle-Breaker-App-459444724585718/"))
+                .setQuote("Checkout this new app Circle Breaker!")
+                .build();
+
+        ShareButton shareButton = (ShareButton)findViewById(R.id.shareButton);
+        shareButton.setShareContent(content);
 
 
         Button playButton = (Button) findViewById(R.id.playButton);

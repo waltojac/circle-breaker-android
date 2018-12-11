@@ -25,4 +25,6 @@
     <string name="nameText">Name</string>
     <string name="levelText">Level</string>
     <string name="chooseLevel">Choose a Level</string>
+    <string name="facebook_app_id">263926417559203</string>
+
 </resources>

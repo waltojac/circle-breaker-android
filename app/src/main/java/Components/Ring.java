@@ -48,7 +48,7 @@ public class Ring implements SensorEventListener {
 
         sectors = new RingSector[numSectors];
         for(int i=0; i < numSectors; i++) {
-            sectors[i] = new RingSector((i*sectorSpan) + gap, ((i+1)*sectorSpan) - gap, rand.nextInt(3) + 1);
+            sectors[i] = new RingSector((i*sectorSpan) + gap, ((i+1)*sectorSpan) - gap, rand.nextInt(4));
     }
 
         mPaint = new Paint();

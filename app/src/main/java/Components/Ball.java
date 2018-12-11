@@ -2,6 +2,7 @@ package Components;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.util.Log;
 
 public class Ball {
     private int mX = 100;
@@ -63,7 +64,20 @@ public class Ball {
         return rad;
     }
 
-    public double getAngle() { return -Math.toDegrees(Math.atan(-dY/dX)) + 90; }
+    public double getAngle() {
+        double angle = Math.toDegrees(Math.atan(dY/dX));
+        if(dY>=0 && dX>=0){
+            Log.d("connor", "dy gr 0: " + dY);
+            return angle;
+        } else if (dY<0 && dX>=0) {
+            Log.d("connor", "dy ls 0 : " + dY);
+            return 360-angle;
+        } else if (dY>=0 && dX<0) {
+            return 180-angle;
+        } else {
+            return 180 + angle;
+        }
+    }
 
     public void draw(Canvas c) {
         if(paint != null) {

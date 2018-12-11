@@ -38,12 +38,12 @@ public class Game {
         ballP = mPaint;
 
         int radius = (int)(c.getWidth() * .45);
-        int numSectors = rand.nextInt(seedLvl/2) + rand.nextInt(seedLvl/2) + 5;
+        int numSectors = (rand.nextInt(seedLvl) + rand.nextInt(seedLvl))/2 + 5;
         myRing = new Ring(centerX, centerY, radius, numSectors, context, seedLvl);
 
-        myB = new Ball(centerX, centerY, 20);
-        myB.setSpeed(0, 10);
-        myB.setAcc(0, .5);
+        myB = new Ball(centerX, centerY + radius/2, 20);
+        myB.setSpeed(0, -10);
+        myB.setAcc(0, .75);
         myB.setPaint(ballP);
     }
 
@@ -51,6 +51,7 @@ public class Game {
         reported = false;
         playing = true;
         won = false;
+        unregisterSensors();
 
         int centerX = c.getWidth()/2;
         int centerY = c.getHeight()/2;
@@ -61,10 +62,11 @@ public class Game {
         int radius = (int)(c.getWidth() * .45);
         int numSectors = rand.nextInt(seedLvl/2) + rand.nextInt(seedLvl/2) + 5;
         myRing = new Ring(centerX, centerY, radius, numSectors, playActivity, seedLvl);
+        registerSensors();
 
-        myB = new Ball(centerX, centerY, 20);
-        myB.setSpeed(0, 10);
-        myB.setAcc(0, .5);
+        myB = new Ball(centerX, centerY + radius/2, 20);
+        myB.setSpeed(0, -10);
+        myB.setAcc(0, .75);
         myB.setPaint(ballP);
     }
 
@@ -81,6 +83,8 @@ public class Game {
             int bY = myB.getY();
 
             if(checkCollision()) {
+                //double a = myB.getAngle();
+                //a = (270 - a);
                 if(playing && myRing.checkHit(0))
                     myB.reflectY();
                 else

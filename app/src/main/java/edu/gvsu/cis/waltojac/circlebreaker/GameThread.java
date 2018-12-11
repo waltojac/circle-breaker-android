@@ -9,7 +9,7 @@ class GameThread extends Thread{
     private boolean running = false;
     private SurfaceHolder mSurfaceHolder;
     private Game g;
-    private long delay = 5;
+    private long delay = 3;
 
     public GameThread (GameView view) {
         this.view = view;

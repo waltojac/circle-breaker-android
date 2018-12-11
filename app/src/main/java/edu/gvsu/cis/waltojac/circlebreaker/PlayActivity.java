@@ -69,7 +69,7 @@ public class PlayActivity extends AppCompatActivity {
     }
 
     public void won(Game game) {
-        Log.d("WONNNNNNN", "won: ");
+        Log.d("score", "won: ");
 
         if (isNetworkAvailable()) {
             if (scoreKey != null) {
@@ -92,7 +92,7 @@ public class PlayActivity extends AppCompatActivity {
         dbRef.child("scores").child(scoreKey).setValue(item);
     }
 
-    public void getScoreRef(final Game game, int i) {
+    public void getScoreRef(final Game game, final int i) {
         dbRef.child("scores").orderByChild("email").equalTo(this.user.getEmail()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -107,8 +107,8 @@ public class PlayActivity extends AppCompatActivity {
                         highScore = Integer.parseInt(score.getValue(ScoreReport.class).level);
                     }
                 }
-                if ((game.seedLvl + 1) > highScore) {
-                    updateScore(game.seedLvl + 1);
+                if (i > highScore) {
+                    updateScore(i);
                 }
             }
 

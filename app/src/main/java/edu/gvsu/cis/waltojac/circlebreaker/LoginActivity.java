@@ -26,14 +26,6 @@ public class LoginActivity extends AppCompatActivity {
     public static final int RC_SIGN_IN = 1;
     private boolean signedIn = false;
 
-    private boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager
-                = (ConnectivityManager) getSystemService(this.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
-    }
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,23 +37,15 @@ public class LoginActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
+        // Create and launch sign-in intent
+        startActivityForResult(
+                AuthUI.getInstance()
+                        .createSignInIntentBuilder()
+                        .setLogo(R.mipmap.logo_round)
+                        .setAvailableProviders(providers)
+                        .build(),
+                RC_SIGN_IN);
 
-        if (isNetworkAvailable()) {
-            Log.d("JAKEEEEEE", "HAS network");
-            // Create and launch sign-in intent
-            startActivityForResult(
-                    AuthUI.getInstance()
-                            .createSignInIntentBuilder()
-                            .setLogo(R.drawable.logo)
-                            .setAvailableProviders(providers)
-                            .build(),
-                    RC_SIGN_IN);
-        } else {
-            Log.d("JAKEEEEEE", "No network");
-            Intent i = new Intent(this, MainActivity.class);
-            i.putExtra("online", false);
-            startActivity(i);
-        }
     }
 
     @Override
@@ -74,11 +58,8 @@ public class LoginActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 // Successfully signed in
                 user = FirebaseAuth.getInstance().getCurrentUser();
-                Toast.makeText(this, "Sign-in worked",
-                        Toast.LENGTH_LONG).show();
                 Intent intent = new Intent();
-                intent.putExtra("online", true);
-                setResult(MainActivity.RC_SIGN_IN ,intent);
+                setResult(MainActivity.RC_SIGN_IN, intent);
                 finish();
                 // ...
             } else {

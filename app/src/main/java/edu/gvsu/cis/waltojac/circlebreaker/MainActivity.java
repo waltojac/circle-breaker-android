@@ -1,6 +1,8 @@
 package edu.gvsu.cis.waltojac.circlebreaker;
 
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -45,29 +47,32 @@ public class MainActivity extends AppCompatActivity {
     protected int topLevel = 1;
 
 
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(this.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+
     @Override
     protected void onResume() {
         super.onResume();
 
-        Intent in = getIntent();
+        if (this.isNetworkAvailable()) {
+            this.online = true;
 
-        if (in.hasExtra("online")) {
-            this.online = in.getBooleanExtra("online", false);
-            Log.d("JAKEEEEEE", "Has Extra: " + this.online);
-
-        }
-
-        if (online) {
-            loadScore();
-            loadLevels();
             user = FirebaseAuth.getInstance().getCurrentUser();
             if (user != null) {
-                Toast.makeText(this, "On Main",
-                        Toast.LENGTH_LONG).show();
+                loadScore();
+                loadLevels();
             } else {
                 Intent i = new Intent(MainActivity.this, LoginActivity.class);
                 startActivityForResult(i, RC_SIGN_IN);
             }
+
+        } else {
+            this.online = false;
         }
 
 

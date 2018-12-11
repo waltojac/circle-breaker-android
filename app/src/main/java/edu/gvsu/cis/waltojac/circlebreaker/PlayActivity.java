@@ -64,13 +64,7 @@ public class PlayActivity extends AppCompatActivity {
                 updateScore(game.seedLvl + 1);
             }
         } else {
-            getScoreRef();
-            while (scoreKey == null) {
-
-            }
-            if ((game.seedLvl + 1) > highScore) {
-                updateScore(game.seedLvl + 1);
-            }
+            getScoreRef(game,game.seedLvl + 1);
         }
 
         game.remake(game.seedLvl + 1);
@@ -82,13 +76,23 @@ public class PlayActivity extends AppCompatActivity {
         dbRef.child("scores").child(scoreKey).setValue(item);
     }
 
-    public void getScoreRef() {
+    public void getScoreRef(final Game game, int i) {
         dbRef.child("scores").orderByChild("email").equalTo(this.user.getEmail()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot score : dataSnapshot.getChildren()) {
-                    scoreKey = score.getKey();
-                    highScore = Integer.parseInt(score.getValue(ScoreReport.class).level);
+                if (!dataSnapshot.exists()) {
+                    item = new ScoreReport(user.getDisplayName(), user.getEmail(), Integer.toString(1));
+                    scoreKey = dbRef.child("scores").push().getKey();
+                    dbRef.child("scores").child(scoreKey).setValue(item);
+                    highScore = 1;
+                } else {
+                    for (DataSnapshot score : dataSnapshot.getChildren()) {
+                        scoreKey = score.getKey();
+                        highScore = Integer.parseInt(score.getValue(ScoreReport.class).level);
+                    }
+                }
+                if ((game.seedLvl + 1) > highScore) {
+                    updateScore(game.seedLvl + 1);
                 }
             }
 
